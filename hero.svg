@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">Baby Cry Monitoring System</title>
+  <desc id="desc">A waveform connects a Raspberry Pi to a parent dashboard. USC EE250 IoT project by Paula Arias and Jaime Martin.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0C1930"/>
+      <stop offset=".58" stop-color="#142B48"/>
+      <stop offset="1" stop-color="#124457"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#64E5D1"/>
+      <stop offset=".6" stop-color="#72C7F6"/>
+      <stop offset="1" stop-color="#F8AB91"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#B8DBEA" stroke-opacity=".075" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="320" rx="22" fill="url(#background)"/>
+  <rect width="1200" height="320" rx="22" fill="url(#grid)"/>
+  <circle cx="1090" cy="48" r="160" fill="#5FCECB" opacity=".055"/>
+  <circle cx="810" cy="286" r="190" fill="#F59A8B" opacity=".035"/>
+  <rect x="60" y="38" width="267" height="31" rx="15.5" fill="#66E1D2" fill-opacity=".12" stroke="#66E1D2" stroke-opacity=".55"/>
+  <circle cx="79" cy="54" r="4" fill="#79E8D5"/>
+  <text x="92" y="59" fill="#BDF9EA" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1.4">USC EE250 · IoT PROJECT</text>
+  <text x="60" y="141" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="52" font-weight="750" letter-spacing="-1.4">Baby Cry</text>
+  <text x="60" y="197" fill="#F5FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="52" font-weight="750" letter-spacing="-1.4">Monitoring System</text>
+  <rect x="61" y="218" width="450" height="3" rx="1.5" fill="url(#accent)"/>
+  <text x="60" y="254" fill="#BDDBE9" font-family="Segoe UI, Arial, sans-serif" font-size="19">One second of sound → a parent alert.</text>
+  <text x="60" y="292" fill="#88B5C8" font-family="Segoe UI, Arial, sans-serif" font-size="14" letter-spacing=".5">PAULA ARIAS  /  JAIME MARTIN</text>
+  <rect x="713" y="63" width="421" height="183" rx="22" fill="#07182A" fill-opacity=".55" stroke="#78B5C4" stroke-opacity=".27"/>
+  <text x="745" y="94" fill="#A9D0DB" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="1.9">LOCAL SIGNAL PATH</text>
+  <line x1="748" y1="158" x2="1100" y2="158" stroke="#356379" stroke-width="2"/>
+  <path d="M748 158 L766 158 L776 143 L787 176 L799 121 L812 183 L825 147 L836 158 L855 158 L864 145 L874 169 L888 115 L901 191 L915 137 L927 158 L945 158 L955 149 L965 168 L976 129 L989 181 L1002 152 L1017 158 L1033 158 L1041 147 L1048 170 L1061 134 L1074 176 L1086 158 L1100 158" fill="none" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="748" cy="158" r="5" fill="#64E5D1"/>
+  <circle cx="1100" cy="158" r="5" fill="#F8AB91"/>
+  <text x="747" y="214" fill="#D8F1F4" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="650">Raspberry Pi</text>
+  <text x="879" y="214" fill="#9DD8E4" font-family="Segoe UI, Arial, sans-serif" font-size="16">MQTT</text>
+  <text x="1022" y="214" fill="#FFE0D6" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="650">Laptop</text>
+</svg>

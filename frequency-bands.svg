@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 455" role="img" aria-labelledby="title desc">
+  <title id="title">Frequency bands and detection checks</title>
+  <desc id="desc">The detector measures energy in a broad 300 to 3000 hertz voice band and rejects frames dominated by a narrow 900 to 1100 hertz beep band. It also requires enough total energy.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F1E32"/>
+      <stop offset="1" stop-color="#132D40"/>
+    </linearGradient>
+    <linearGradient id="voice" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#43BFAE"/>
+      <stop offset="1" stop-color="#76D6EA"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="455" rx="22" fill="url(#background)"/>
+  <text x="62" y="55" fill="#F2FAFD" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700">What the FFT listens for</text>
+  <text x="62" y="86" fill="#A9CBD9" font-family="Segoe UI, Arial, sans-serif" font-size="17">These are analysis windows, not a plot of a recorded sound.</text>
+
+  <text x="62" y="151" fill="#A6EBDC" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700">VOICE</text>
+  <rect x="168" y="121" width="920" height="49" rx="11" fill="#213C4F"/>
+  <rect x="247" y="121" width="710" height="49" rx="11" fill="url(#voice)"/>
+  <text x="552" y="151" fill="#082231" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700">300–3000 Hz</text>
+
+  <text x="62" y="236" fill="#F5BC9E" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700">BEEP</text>
+  <rect x="168" y="205" width="920" height="49" rx="11" fill="#213C4F"/>
+  <rect x="405" y="205" width="53" height="49" rx="8" fill="#F5AC8D"/>
+  <path d="M431 194v-18h180" fill="none" stroke="#F5AC8D" stroke-width="2"/>
+  <text x="620" y="181" fill="#F9C9B1" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700">900–1100 Hz narrow tone</text>
+
+  <line x1="168" y1="290" x2="1088" y2="290" stroke="#57778A" stroke-width="2"/>
+  <g fill="#9EBDCC" font-family="Segoe UI, Arial, sans-serif" font-size="14" text-anchor="middle">
+    <text x="168" y="322">0</text>
+    <text x="247" y="322">300</text>
+    <text x="405" y="322">900</text>
+    <text x="458" y="322">1100</text>
+    <text x="957" y="322">3000</text>
+    <text x="1088" y="322">3500 Hz</text>
+  </g>
+  <g stroke="#57778A" stroke-width="2">
+    <path d="M168 284v12M247 284v12M405 284v12M458 284v12M957 284v12M1088 284v12"/>
+  </g>
+  <rect x="61" y="358" width="337" height="57" rx="12" fill="#203B4D" stroke="#52788B"/>
+  <circle cx="86" cy="387" r="7" fill="#82C6EE"/>
+  <text x="106" y="393" fill="#E5F4FB" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="650">Total energy &gt; 1 × 10⁷</text>
+  <rect x="431" y="358" width="337" height="57" rx="12" fill="#203B4D" stroke="#52788B"/>
+  <circle cx="457" cy="387" r="7" fill="#59D6C2"/>
+  <text x="477" y="393" fill="#E5F4FB" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="650">Voice ratio &gt; 70%</text>
+  <rect x="801" y="358" width="337" height="57" rx="12" fill="#203B4D" stroke="#52788B"/>
+  <circle cx="827" cy="387" r="7" fill="#F5AC8D"/>
+  <text x="847" y="393" fill="#E5F4FB" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="650">Beep ratio ≤ 60%</text>
+</svg>

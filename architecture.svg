@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 510" role="img" aria-labelledby="title desc">
+  <title id="title">Baby cry monitor system architecture</title>
+  <desc id="desc">A microphone and Raspberry Pi classify audio, send JSON status through a Mosquitto broker on the Pi, and a Windows laptop sounds an alarm. The laptop also publishes an acknowledgement to the broker; the Pi script does not subscribe to it.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1C30"/>
+      <stop offset="1" stop-color="#122D3E"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#65DFC9"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#F6AB89"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="510" rx="22" fill="url(#background)"/>
+  <text x="56" y="53" fill="#F2FAFD" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700">From sound to a parent alert</text>
+  <text x="56" y="81" fill="#9DBECD" font-family="Segoe UI, Arial, sans-serif" font-size="16">Two physical devices · one MQTT broker running on the Pi</text>
+
+  <rect x="55" y="118" width="338" height="246" rx="17" fill="#172E43" stroke="#397482" stroke-width="2"/>
+  <rect x="55" y="118" width="338" height="7" rx="3.5" fill="#65DFC9"/>
+  <circle cx="98" cy="170" r="25" fill="#65DFC9" fill-opacity=".12"/>
+  <rect x="92" y="153" width="12" height="24" rx="6" fill="#65DFC9"/>
+  <path d="M84 169a14 14 0 0 0 28 0M98 183v8M89 191h18" fill="none" stroke="#65DFC9" stroke-width="3" stroke-linecap="round"/>
+  <text x="134" y="166" fill="#8FE6DA" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.3">SENSE + CLASSIFY</text>
+  <text x="80" y="223" fill="#F5FBFE" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">Raspberry Pi 4</text>
+  <text x="80" y="256" fill="#C5DFE8" font-family="Segoe UI, Arial, sans-serif" font-size="17">USB microphone · 1 s at 16 kHz</text>
+  <text x="80" y="287" fill="#C5DFE8" font-family="Segoe UI, Arial, sans-serif" font-size="17">FFT voice / beep energy checks</text>
+  <text x="80" y="318" fill="#C5DFE8" font-family="Segoe UI, Arial, sans-serif" font-size="17">2 consecutive frames → cry state</text>
+
+  <path d="M399 243H424" stroke="#65DFC9" stroke-width="3.5" marker-end="url(#arrow)"/>
+
+  <rect x="434" y="118" width="332" height="246" rx="17" fill="#173246" stroke="#4C8C9A" stroke-width="2"/>
+  <rect x="434" y="118" width="332" height="7" rx="3.5" fill="#7BC6E8"/>
+  <circle cx="477" cy="170" r="25" fill="#7BC6E8" fill-opacity=".12"/>
+  <circle cx="477" cy="170" r="9" fill="none" stroke="#7BC6E8" stroke-width="3"/>
+  <circle cx="462" cy="158" r="4" fill="#7BC6E8"/>
+  <circle cx="492" cy="158" r="4" fill="#7BC6E8"/>
+  <circle cx="477" cy="189" r="4" fill="#7BC6E8"/>
+  <path d="M467 163l-3-3M487 163l3-3M477 179v6" fill="none" stroke="#7BC6E8" stroke-width="2"/>
+  <text x="514" y="166" fill="#A2D8F0" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.3">ROUTE MESSAGES</text>
+  <text x="458" y="223" fill="#F5FBFE" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">Mosquitto MQTT</text>
+  <text x="458" y="256" fill="#C5DFE8" font-family="Segoe UI, Arial, sans-serif" font-size="17">Broker runs on the Pi</text>
+  <text x="458" y="287" fill="#C5DFE8" font-family="Segoe UI, Arial, sans-serif" font-size="17">Status topic carries JSON</text>
+  <text x="458" y="318" fill="#C5DFE8" font-family="Segoe UI, Arial, sans-serif" font-size="17">Local network · port 1883</text>
+
+  <path d="M772 243H797" stroke="#65DFC9" stroke-width="3.5" marker-end="url(#arrow)"/>
+
+  <rect x="807" y="118" width="338" height="246" rx="17" fill="#342C3E" stroke="#9E6D79" stroke-width="2"/>
+  <rect x="807" y="118" width="338" height="7" rx="3.5" fill="#F6AB89"/>
+  <circle cx="850" cy="170" r="25" fill="#F6AB89" fill-opacity=".12"/>
+  <rect x="836" y="157" width="28" height="21" rx="2" fill="none" stroke="#F6AB89" stroke-width="3"/>
+  <path d="M833 183h34" stroke="#F6AB89" stroke-width="3" stroke-linecap="round"/>
+  <text x="888" y="166" fill="#F7C4AF" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.3">SHOW + ALERT</text>
+  <text x="832" y="223" fill="#F5FBFE" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">Parent dashboard</text>
+  <text x="832" y="256" fill="#F1D9DC" font-family="Segoe UI, Arial, sans-serif" font-size="17">Windows · Tkinter GUI</text>
+  <text x="832" y="287" fill="#F1D9DC" font-family="Segoe UI, Arial, sans-serif" font-size="17">Alarm if 7 of last 10 states</text>
+  <text x="832" y="318" fill="#F1D9DC" font-family="Segoe UI, Arial, sans-serif" font-size="17">Acknowledge silences alarm</text>
+
+  <path d="M979 370V405H600V370" fill="none" stroke="#F6AB89" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#arrow-orange)"/>
+  <rect x="661" y="389" width="258" height="31" rx="15" fill="#1A3346"/>
+  <text x="681" y="410" fill="#F9B899" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="650">ACK message published</text>
+  <circle cx="69" cy="465" r="5" fill="#F6AB89"/>
+  <text x="85" y="469" fill="#B7D4DD" font-family="Segoe UI, Arial, sans-serif" font-size="15">Current code: acknowledgement clears the laptop alarm; the Pi does not subscribe to the ACK topic.</text>
+</svg>
