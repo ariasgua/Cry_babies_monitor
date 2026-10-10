@@ -1,39 +1,67 @@
-# Baby Cry Monitoring System
+<p align="center">
+  <img src="assets/hero.svg" alt="Baby Cry Monitoring System: Raspberry Pi to MQTT to parent dashboard" width="100%">
+</p>
 
-**Paula Arias** · Raspberry Pi · Python · FFT · MQTT · Tkinter
+<p align="center"><strong>Listen → analyze → publish → alert</strong></p>
+<p align="center">
+  <a href="#the-system">See the system</a> ·
+  <a href="#how-a-cry-like-frame-is-detected">Explore the detector</a> ·
+  <a href="#run-the-prototype">Run it</a> ·
+  <a href="#project-materials">Project files</a>
+</p>
 
-An IoT prototype that listens for cry-like sounds on a Raspberry Pi and alerts a parent through a Windows desktop dashboard. The Pi analyzes short audio recordings and publishes its results over MQTT; the dashboard uses recent results to decide when to sound an alarm.
+> **Safety note:** This is an educational prototype, not a medical device or a substitute for direct adult supervision. Its rule-based detector can miss crying or mistake other sounds for crying.
 
-> **Safety note:** This is an educational prototype, not a medical device or a substitute for direct adult supervision. Its threshold-based detector can miss crying or mistake other sounds for crying.
+## Why we built it
 
-## How it works
+As our EE250 final project at USC, **Paula Arias and Jaime Martin** wanted to connect signal processing with a complete, working IoT system. Memories of growing up with younger siblings inspired a simple question: could a Raspberry Pi listen for cry-like sounds and notify someone on a separate computer?
 
-| Part | What it does | Main tools |
-| --- | --- | --- |
-| Raspberry Pi | Records audio, measures frequency-band energy, and publishes a cry state | USB microphone, ALSA `arecord`, NumPy, SciPy, Paho MQTT |
-| MQTT broker | Passes status messages from the Pi to the laptop | Mosquitto |
-| Parent laptop | Displays the latest state and sounds an alarm until it is acknowledged | Python, Tkinter, `winsound`, Paho MQTT |
+The result connects a USB microphone, a Raspberry Pi 4, an MQTT broker, and a Windows dashboard. It demonstrates audio capture, FFT analysis, messages between devices, and a parent acknowledgement workflow.
 
-1. The Pi records a one-second, 16 kHz mono audio frame to `frame_fft.wav`.
-2. It removes the frame's DC offset and uses a real-valued FFT to measure spectral energy.
-3. It compares energy in the **300–3000 Hz voice band** with energy in the **900–1100 Hz narrow-tone band**. A frame counts as cry-like when it is sufficiently loud, voice-band dominant, and not dominated by the narrow tone.
-4. The Pi publishes `crying: true` after **two consecutive** cry-like frames, along with a timestamp and energy ratios.
-5. The dashboard considers the **last ten** received states. Once it has ten samples, it activates the alarm if **at least seven** are active. The alarm remains active until the parent presses **Acknowledge**.
+| **1 second** | **16 kHz** | **2 frames** | **7 of 10** |
+| :---: | :---: | :---: | :---: |
+| Audio per sample | Mono capture rate | Positive frames before the Pi reports crying | Recent positive states before the dashboard alarms |
 
-These are adjustable heuristics in the two Python scripts, not a trained baby-cry classifier. Different microphones and rooms need calibration.
+## The system
 
-## Repository files
+![System architecture: microphone and Raspberry Pi classify audio, Mosquitto routes status, and a Windows dashboard alerts the parent. The dashboard sends an acknowledgement to MQTT, but the current Pi script does not receive it.](assets/architecture.svg)
 
-| File | Purpose |
-| --- | --- |
-| [`cry_detector_publisher.py`](cry_detector_publisher.py) | Raspberry Pi audio capture, FFT analysis, and MQTT publisher |
-| [`parent_dashboard.py`](parent_dashboard.py) | Windows dashboard, rolling decision, alarm, and acknowledgement button |
-| [Project report](Baby%20Cry%20Monitoring%20System%20%E2%80%93%20End-to-End%20IoT%20Project%20_%20Jaime%20Martin%26Paula%20Arias.docx) | Original design and implementation report |
-| [Video link document](VIDEO%20LINK.docx) | Original video link document |
+**Two physical nodes, one logical broker:** Mosquitto runs on the Pi. The dashboard subscribes to the Pi's JSON status messages over the local network and keeps the alarm active until a parent clicks **Acknowledge**. The dashboard publishes an acknowledgement event, but the current Pi script does not subscribe to that event; the button clears the alarm on the laptop.
 
-## Set up the Raspberry Pi
+## How a cry-like frame is detected
 
-You need a Raspberry Pi with a USB microphone and network access to the Windows laptop. On the Pi, install the recording tools, broker, and Python libraries:
+![Analysis bands: 300 to 3000 Hz voice band and 900 to 1100 Hz narrow-tone band, plus the detector's three thresholds.](assets/frequency-bands.svg)
+
+The Pi records one-second audio frames with `arecord`, reads the WAV file with SciPy, removes the DC offset, and computes an FFT with NumPy. It checks the broad voice band while rejecting frames dominated by a narrow beep-like tone. It then requires **two consecutive positive frames** before publishing an active cry state. The dashboard waits for **ten received states** and sounds an alarm when **at least seven** are active. These numbers come from the current Python scripts.
+
+<details>
+<summary><strong>Click to see the exact signal checks</strong></summary>
+
+The publisher calculates:
+
+- `total_energy`: sum of squared FFT magnitudes.
+- `voice_ratio`: energy from **300–3000 Hz** divided by total energy.
+- `beep_ratio`: energy from **900–1100 Hz** divided by total energy.
+
+A frame is marked cry-like only when **all three** checks pass:
+
+```text
+total_energy > 10,000,000
+voice_ratio > 0.70
+beep_ratio <= 0.60
+```
+
+The narrow band lies inside the broader voice band; rejecting a large narrow-band ratio helps avoid labeling a pure tone as a cry. These are hand-tuned heuristics, not an audio machine-learning model.
+
+</details>
+
+## Run the prototype
+
+You need a **Raspberry Pi 4 with a USB microphone**, a **Windows laptop**, and a trusted local network. The team used a SunFounder USB 2.0 Mini Microphone Model B and a mobile hotspot for the original demonstration. Other microphones may need threshold or device adjustments.
+
+### 1. Prepare the Raspberry Pi
+
+Install the audio tools, Mosquitto, and Python dependencies:
 
 ```bash
 sudo apt update
@@ -41,7 +69,7 @@ sudo apt install -y alsa-utils mosquitto mosquitto-clients python3-venv python3-
 sudo systemctl enable --now mosquitto
 ```
 
-Clone this repository and install the MQTT client in a virtual environment:
+Clone this repository, make a virtual environment, and install the MQTT client:
 
 ```bash
 git clone https://github.com/ariasgua/Cry_babies_monitor.git
@@ -50,62 +78,102 @@ python3 -m venv --system-site-packages .venv
 .venv/bin/python -m pip install paho-mqtt
 ```
 
-Check that the microphone appears with `arecord -l`. The script uses ALSA's default input device; if that is not your USB microphone, select the correct device in `record_frame()` in `cry_detector_publisher.py`.
+Check the microphone with `arecord -l`. The script records from ALSA's default input device; if necessary, select your USB microphone in `record_frame()` in `cry_detector_publisher.py`.
 
-The publisher connects to `localhost:1883`, while the dashboard must connect to the Pi over the local network. **The scripts have no MQTT username or password.** For a lab demonstration on a trusted network, Mosquitto needs a listener that the laptop can reach. Open a configuration file with `sudo nano /etc/mosquitto/conf.d/baby-monitor.conf` and enter:
+<details>
+<summary><strong>Click to configure the MQTT broker for a local demo</strong></summary>
+
+The Pi script connects to `localhost:1883`. The laptop needs to reach that same broker at the Pi's local IP address. The current scripts do not supply MQTT credentials. On a **trusted, isolated local network**, open a Mosquitto configuration file:
+
+```bash
+sudo nano /etc/mosquitto/conf.d/baby-monitor.conf
+```
+
+Enter the following lab configuration, save it, and restart Mosquitto:
 
 ```conf
 listener 1883
 allow_anonymous true
 ```
 
-Restart it with `sudo systemctl restart mosquitto`. Keep this broker on a trusted local network and do not expose port `1883` to the internet. Find the Pi's local address with `hostname -I`; you will enter that address in the dashboard script.
+```bash
+sudo systemctl restart mosquitto
+hostname -I
+```
 
-## Set up the Windows dashboard
+Use the displayed Pi IP address in the next step. This listener accepts unauthenticated connections, so keep port `1883` off the public internet. For deployment outside a lab, add authentication and encryption to both broker and clients.
 
-Install Python 3 on the laptop, download or clone this repository there, and run these commands in its folder:
+</details>
+
+### 2. Prepare the Windows laptop
+
+Download or clone this repository on the laptop. In its folder, run:
 
 ```powershell
 py -m venv .venv
 .venv\Scripts\python.exe -m pip install paho-mqtt
 ```
 
-In `parent_dashboard.py`, change `BROKER_HOST` to the Pi's current local IP address. The default address in the script is specific to the original setup and may not work on your network. The laptop must be able to reach the Pi on TCP port `1883`.
+Open `parent_dashboard.py` and set `BROKER_HOST` to the Pi's **current local IP address**. The value in the file comes from the original lab setup and may not work on your network. The laptop must be able to reach port `1883` on the Pi.
 
-For a custom alarm sound, place a WAV file named `mixkit-warning-alarm-buzzer-991.wav` beside `parent_dashboard.py`. If the file is absent, the app uses the system bell.
+The dashboard looks for `mixkit-warning-alarm-buzzer-991.wav` beside its script. If that file is absent, it uses the system bell.
 
-## Run the system
+### 3. Start both programs
 
-Start the detector on the Pi:
+On the Pi:
 
 ```bash
 .venv/bin/python cry_detector_publisher.py
 ```
 
-Then start the dashboard on the Windows laptop:
+On the Windows laptop:
 
 ```powershell
 .venv\Scripts\python.exe parent_dashboard.py
 ```
 
-The dashboard shows the incoming cry state, recent cry ratio, and alarm status. Press **Acknowledge** after checking on the baby to clear an active alarm. Stop either script with `Ctrl+C` or close the dashboard window.
+Watch the dashboard's current state and recent cry ratio. If an alarm sounds, check on the baby and press **Acknowledge** to clear the laptop alarm. Stop the Pi script with `Ctrl+C` and close the dashboard window when finished.
 
-### MQTT messages
+## Explore the messages
 
-| Topic | Sent by | Contents |
+| MQTT topic | Publisher | Purpose |
 | --- | --- | --- |
-| `jaimem57/baby/cry_status` | Pi | JSON with `crying`, frame number, timestamp, total energy, voice ratio, and beep ratio |
-| `jaimem57/baby/parent_ack` | Dashboard | JSON acknowledgement flag and timestamp |
+| `jaimem57/baby/cry_status` | Raspberry Pi | Frame index, timestamp, energy measurements, and smoothed `crying` state |
+| `jaimem57/baby/parent_ack` | Laptop | Acknowledgement flag and timestamp |
 
-The dashboard publishes an acknowledgement message when its button is pressed. The current Pi script does **not** subscribe to that topic; the button clears the dashboard's alarm locally.
+<details>
+<summary><strong>Click to see an example status message</strong></summary>
 
-## Limitations and next steps
+The values below are illustrative; the keys match the publisher's JSON payload.
 
-- The manually chosen audio thresholds can give false positives and false negatives; the project has no measured accuracy claim.
-- The Pi writes the latest recorded audio frame to a local `frame_fft.wav` file. Do not commit or share recordings unintentionally.
-- The example broker configuration uses unencrypted, unauthenticated MQTT on a trusted local network.
-- Useful next steps are testing with a labeled audio set, reporting precision and recall, improving noise handling, and adding authenticated MQTT.
+```json
+{
+  "crying": true,
+  "frame": 12,
+  "timestamp": 1710000000.0,
+  "total_energy": 16000000.0,
+  "voice_ratio": 0.82,
+  "beep_ratio": 0.08
+}
+```
 
-## Credits
+The dashboard bases its alarm on recent `crying` values. The acknowledgement button publishes `{"ack": true, "timestamp": ...}` and clears the dashboard's local history and alarm.
 
-Developed by **Paula Arias and Jaime Martin**. See the [original project report](Baby%20Cry%20Monitoring%20System%20%E2%80%93%20End-to-End%20IoT%20Project%20_%20Jaime%20Martin%26Paula%20Arias.docx) for the full project write-up.
+</details>
+
+## What we learned and what comes next
+
+Working with real microphone data made FFT analysis concrete. MQTT separated sensing from the dashboard, and a rolling window helped prevent single-frame events from immediately becoming alarms. The original [project report](Baby%20Cry%20Monitoring%20System%20%E2%80%93%20End-to-End%20IoT%20Project%20_%20Jaime%20Martin%26Paula%20Arias.docx) discusses the design decisions and lessons learned.
+
+The detector still relies on manually tuned thresholds. Microphone sensitivity, background voices, and room acoustics can change its behavior; we have not established a measured detection accuracy. The Pi writes each recorded frame to a local `frame_fft.wav` file, and the lab MQTT configuration has no authentication or encryption. Future work includes a labeled evaluation set, precision and recall measurements, adaptive noise handling, and authenticated MQTT.
+
+## Project materials
+
+| File | What's inside |
+| --- | --- |
+| [`cry_detector_publisher.py`](cry_detector_publisher.py) | Pi audio capture, FFT analysis, and MQTT publisher |
+| [`parent_dashboard.py`](parent_dashboard.py) | Windows Tkinter dashboard, rolling alarm, and acknowledgement |
+| [End-to-end project report](Baby%20Cry%20Monitoring%20System%20%E2%80%93%20End-to-End%20IoT%20Project%20_%20Jaime%20Martin%26Paula%20Arias.docx) | Full team write-up, including design and limitations |
+| [Video link document](VIDEO%20LINK.docx) | Original demo link document |
+
+**Built by Paula Arias and Jaime Martin for USC EE250.**
