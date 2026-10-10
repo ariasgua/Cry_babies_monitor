@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/hero.svg" alt="Baby Cry Monitoring System: Raspberry Pi to MQTT to parent dashboard" width="100%">
+  <img src="hero.svg" alt="Baby Cry Monitoring System: Raspberry Pi to MQTT to parent dashboard" width="100%">
 </p>
 
 <p align="center"><strong>Listen → analyze → publish → alert</strong></p>
@@ -24,13 +24,13 @@ The result connects a USB microphone, a Raspberry Pi 4, an MQTT broker, and a Wi
 
 ## The system
 
-![System architecture: microphone and Raspberry Pi classify audio, Mosquitto routes status, and a Windows dashboard alerts the parent. The dashboard sends an acknowledgement to MQTT, but the current Pi script does not receive it.](assets/architecture.svg)
+![System architecture: microphone and Raspberry Pi classify audio, Mosquitto routes status, and a Windows dashboard alerts the parent. The dashboard sends an acknowledgement to MQTT, but the current Pi script does not receive it.](architecture.svg)
 
 **Two physical nodes, one logical broker:** Mosquitto runs on the Pi. The dashboard subscribes to the Pi's JSON status messages over the local network and keeps the alarm active until a parent clicks **Acknowledge**. The dashboard publishes an acknowledgement event, but the current Pi script does not subscribe to that event; the button clears the alarm on the laptop.
 
 ## How a cry-like frame is detected
 
-![Analysis bands: 300 to 3000 Hz voice band and 900 to 1100 Hz narrow-tone band, plus the detector's three thresholds.](assets/frequency-bands.svg)
+![Analysis bands: 300 to 3000 Hz voice band and 900 to 1100 Hz narrow-tone band, plus the detector's three thresholds.](frequency-bands.svg)
 
 The Pi records one-second audio frames with `arecord`, reads the WAV file with SciPy, removes the DC offset, and computes an FFT with NumPy. It checks the broad voice band while rejecting frames dominated by a narrow beep-like tone. It then requires **two consecutive positive frames** before publishing an active cry state. The dashboard waits for **ten received states** and sounds an alarm when **at least seven** are active. These numbers come from the current Python scripts.
 
